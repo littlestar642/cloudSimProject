@@ -84,6 +84,10 @@ public class GreedyAlgo{
 			Datacenter datacenter0 = createDatacenter("Datacenter_0");
 			@SuppressWarnings("unused")
 			Datacenter datacenter1 = createDatacenter("Datacenter_1");
+			@SuppressWarnings("unused")
+			Datacenter datacenter2 = createDatacenter("Datacenter_2");
+			@SuppressWarnings("unused")
+			Datacenter datacenter3 = createDatacenter("Datacenter_3");
 
 
 			//Third step: Create Broker
@@ -164,22 +168,22 @@ public class GreedyAlgo{
 			length = 30000;
 			fileSize = 400;
 			Cloudlet cloudlet3 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet2.setUserId(brokerId);
-			JobVector j3=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet2);
+			cloudlet3.setUserId(brokerId);
+			JobVector j3=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet3);
 
 			id++;
 			length = 30000;
 			fileSize = 400;
 			Cloudlet cloudlet4 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet2.setUserId(brokerId);
-			JobVector j4=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet2);
+			cloudlet4.setUserId(brokerId);
+			JobVector j4=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet4);
 
 			id++;
 			length = 30000;
 			fileSize = 400;
 			Cloudlet cloudlet5 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet2.setUserId(brokerId);
-			JobVector j5=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet2);
+			cloudlet5.setUserId(brokerId);
+			JobVector j5=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet5);
 
 
 			//add the cloudlets to the list
@@ -219,7 +223,6 @@ public class GreedyAlgo{
 			}
 
 
-			broker.bindCloudletToVm(cloudlet2.getCloudletId(),vm2.getId());
 
 			// Sixth step: Starts the simulation
 			CloudSim.startSimulation();
