@@ -1,0 +1,3 @@
+java -classpath cloudsim-3.0.3.jar:cloudsim-examples-3.0.3.jar GreedyAlgo.java
+
+javac -classpath cloudsim-3.0.3.jar GreedyAlgo.java
