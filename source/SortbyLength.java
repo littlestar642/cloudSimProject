@@ -2,14 +2,12 @@ package source;
 
 import java.util.Comparator;
 
-import org.cloudbus.cloudsim.Cloudlet;
-
-class SortbyLength implements Comparator<Cloudlet> 
+class SortbyLength implements Comparator<JobVector> 
 { 
     // Used for sorting in acending order of 
     // roll number 
-    public int compare(Cloudlet a,Cloudlet b) 
+    public int compare(JobVector a,JobVector b) 
     { 
-        return (int)a.getCloudletLength() - (int)b.getCloudletLength();
+        return (int)a.getCloudlet().getCloudletLength() - (int)b.getCloudlet().getCloudletLength();
     } 
 }

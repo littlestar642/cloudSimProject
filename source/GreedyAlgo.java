@@ -204,21 +204,29 @@ public class GreedyAlgo{
 			//submit cloudlet list to the broker
 			broker.submitCloudletList(cloudletList);
 
+			// separate both the type of jobs
 
+			ArrayList<JobVector> timeTypeList=new ArrayList<>();
+			ArrayList<JobVector> bwTypeList=new ArrayList<>();
+
+			jobList.forEach(v->{
+				if(v.getClassType()==1)timeTypeList.add(v);
+				else bwTypeList.add(v);
+			});
 			//bind the cloudlets to the vms. This way, the broker
 			// will submit the bound cloudlets only to the specific VM
 
 			// algorithm for time-type processing
 
 			Collections.sort(vmlist,new SortbyMips());
-			Collections.sort(cloudletList,new SortbyLength());
+			Collections.sort(timeTypeList,new SortbyLength());
 
 			for(int i=0,j=0;i<5;i++,j++){
 				if(i<4){
-					broker.bindCloudletToVm(cloudletList.get(i).getCloudletId(),vmlist.get(j).getId());
+					broker.bindCloudletToVm(timeTypeList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
 				}else{
 					j=0;
-					broker.bindCloudletToVm(cloudletList.get(i).getCloudletId(),vmlist.get(j).getId());
+					broker.bindCloudletToVm(timeTypeList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
 				}
 			}
 

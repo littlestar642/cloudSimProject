@@ -24,6 +24,14 @@ public class JobVector{
         this.cl=cl;
     }
 
+    public double getClassType(){
+        return this.classType;
+    }
+
+    public Cloudlet getCloudlet(){
+        return this.cl;
+    }
+
     public void setJval(double val){
         this.jVal=val;
     }
