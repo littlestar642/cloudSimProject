@@ -13,8 +13,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
@@ -295,6 +297,75 @@ public class GreedyAlgo{
 
 			// Final step: Print results when simulation is over
 			List<Cloudlet> newList = broker.getCloudletReceivedList();
+
+			// add start and end time to job vectors
+			newList.forEach(c->{
+				double ID =c.getCloudletId();
+				jobList.forEach(j->{
+					if(j.getCloudlet().getCloudletId()==ID){
+						j.setStartTime(c.getExecStartTime());
+						j.setEndTime(c.getFinishTime());
+					}
+				});
+			});
+
+			// create DS for TPi
+			HashMap<Integer,Double> tpMap=new HashMap<>();
+			ArrayList<Double> trList=new ArrayList<>();
+
+			newList.forEach(c->{
+				trList.add(c.getActualCPUTime());
+			});
+
+			double trMax=Collections.max(trList);
+			double trMin=Collections.min(trList);
+
+			double denom=trMax-trMin+1;
+
+			newList.forEach(c->{
+				tpMap.put(c.getCloudletId(),c.getActualCPUTime()/denom);
+			});
+
+			// create DS for ETPi
+			HashMap<Integer,Double> etpMap=new HashMap<>();
+			HashMap<Integer,Double> etrMap=new HashMap<>();
+			ArrayList<Double> etrList=new ArrayList<>();
+
+			newList.forEach(c->{
+				int vmID=c.getVmId();
+				int cID=c.getCloudletId();
+				vmlist.forEach(vm->{
+					if(vm.getId()==vmID){
+						cloudletList.forEach(cl->{
+							if(cl.getCloudletId()==cID){
+								double val=(double)cl.getCloudletLength()/(double)vm.getMips();
+								etrMap.put(cID,val);
+								etrList.add(val);
+							}
+						});
+					}
+				});
+			});
+
+			double etrMax=Collections.max(etrList);
+			double etrMin=Collections.min(etrList);
+
+			double eDenom=etrMax-etrMin+1;
+
+			newList.forEach(c->{
+				etpMap.put(c.getCloudletId(),etrMap.get(c.getCloudletId())/eDenom);
+			});
+
+			// create DS for JEF time
+
+			TreeMap<Double,Integer> jefTimeMap=new TreeMap<>();
+
+			cloudletList.forEach(cl->{
+				jefTimeMap.put(tpMap.get(cl.getCloudletId())/etpMap.get(cl.getCloudletId()),cl.getCloudletId());
+			});
+
+			
+
 
 			CloudSim.stopSimulation();
 

@@ -44,6 +44,10 @@ public class JobVector{
         this.endTime=val;
     }
 
+    public void setStartTime(double val){
+        this.startTime=val;
+    }
+
     
 
 }
