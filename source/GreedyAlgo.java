@@ -13,7 +13,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,12 +81,6 @@ public class GreedyAlgo{
 			//Datacenters are the resource providers in CloudSim. We need at list one of them to run a CloudSim simulation
 			@SuppressWarnings("unused")
 			Datacenter datacenter0 = createDatacenter("Datacenter_0");
-			@SuppressWarnings("unused")
-			Datacenter datacenter1 = createDatacenter("Datacenter_1");
-			@SuppressWarnings("unused")
-			Datacenter datacenter2 = createDatacenter("Datacenter_2");
-			@SuppressWarnings("unused")
-			Datacenter datacenter3 = createDatacenter("Datacenter_3");
 
 
 			//Third step: Create Broker
@@ -103,11 +96,11 @@ public class GreedyAlgo{
 
 			//VM description
 			int vmid = 0;
-			int mips = 250;
+			int mips = 300;
 			long size = 1000; //image size (MB)
-			int ram = 512; //vm memory (MB)
-			long bw = 1000;
-			int pesNumber = 1; //number of cpus
+			int ram = 2048; //vm memory (MB)
+			long bw = 2000;
+			int pesNumber = 4; //number of cpus
 			String vmm = "Xen"; //VMM name
 
 			//create five VMs
@@ -116,17 +109,23 @@ public class GreedyAlgo{
 
 			vmid++;
 			mips=200;
-			size=2000;
+			ram = 1024;
+			bw = 3000;
+			pesNumber = 2;
 			Vm vm2 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
 			vmid++;
-			mips=300;
-			size=2000;
+			mips=400;
+			ram = 1024;
+			bw = 1200;
+			pesNumber = 2;
 			Vm vm3 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
 			vmid++;
-			mips=400;
-			size=2000;
+			mips=350;
+			ram = 512;
+			bw = 2500;
+			pesNumber = 1;
 			Vm vm4 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
 			
@@ -148,42 +147,70 @@ public class GreedyAlgo{
 
 			//Cloudlet properties
 			int id = 0;
-			long length = 40000;
-			long fileSize = 300;
-			long outputSize = 300;
+			long length = 4000;
+			long fileSize = 2500;
+			long outputSize = 500;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
 
 			Cloudlet cloudlet1 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet1.setUserId(brokerId);
-			JobVector j1=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet1);
+			JobVector j1=new JobVector(1,0,0,400,0,0,0,cloudlet1);
 
 			id++;
-			length = 30000;
-			fileSize = 400;
+			length = 3000;
+			fileSize = 2500;
+			outputSize = 400;
 			Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet2.setUserId(brokerId);
-			JobVector j2=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet2);
+			JobVector j2=new JobVector(1,0,0,200,0,0,0,cloudlet2);
 
 			id++;
-			length = 30000;
-			fileSize = 400;
+			length = 2000;
+			fileSize = 800;
+			outputSize = 300;
 			Cloudlet cloudlet3 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet3.setUserId(brokerId);
-			JobVector j3=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet3);
+			JobVector j3=new JobVector(1,0,0,150,0,0,0,cloudlet3);
 
 			id++;
-			length = 30000;
-			fileSize = 400;
+			length = 5000;
+			fileSize = 5000;
+			outputSize = 2000;
 			Cloudlet cloudlet4 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet4.setUserId(brokerId);
-			JobVector j4=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet4);
+			JobVector j4=new JobVector(1,0,0,500,0,0,0,cloudlet4);
 
 			id++;
-			length = 30000;
-			fileSize = 400;
+			length = 2000;
+			fileSize = 800;
+			outputSize = 300;
 			Cloudlet cloudlet5 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet5.setUserId(brokerId);
-			JobVector j5=new JobVector(1, 0.0, 10.0,100,0,0,cloudlet5);
+			JobVector j5=new JobVector(2,0,0,0,2000,0,0,cloudlet5);
+
+			id++;
+			length = 3000;
+			fileSize = 2000;
+			outputSize = 400;
+			Cloudlet cloudlet6 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			cloudlet6.setUserId(brokerId);
+			JobVector j6=new JobVector(2,0,0,0,3000,0,0,cloudlet6);
+
+			id++;
+			length = 800;
+			fileSize = 300;
+			outputSize = 300;
+			Cloudlet cloudlet7 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			cloudlet7.setUserId(brokerId);
+			JobVector j7=new JobVector(2,0,0,0,1200,0,0,cloudlet7);
+
+			id++;
+			length = 2500;
+			fileSize = 1000;
+			outputSize = 500;
+			Cloudlet cloudlet8 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			cloudlet8.setUserId(brokerId);
+			JobVector j8=new JobVector(2,0,0,0,2000,0,0,cloudlet8);
 
 
 			//add the cloudlets to the list
@@ -192,6 +219,9 @@ public class GreedyAlgo{
 			cloudletList.add(cloudlet3);
 			cloudletList.add(cloudlet4);
 			cloudletList.add(cloudlet5);
+			cloudletList.add(cloudlet6);
+			cloudletList.add(cloudlet7);
+			cloudletList.add(cloudlet8);
 
 			// add Job vectors to jobList
 
@@ -200,34 +230,42 @@ public class GreedyAlgo{
 			jobList.add(j3);
 			jobList.add(j4);
 			jobList.add(j5);
+			jobList.add(j6);
+			jobList.add(j7);
+			jobList.add(j8);
 
 			//submit cloudlet list to the broker
-			broker.submitCloudletList(cloudletList);
 
 			// separate both the type of jobs
 
-			ArrayList<JobVector> timeTypeList=new ArrayList<>();
-			ArrayList<JobVector> bwTypeList=new ArrayList<>();
+			ArrayList<JobVector> timeTypeVectorList=new ArrayList<>();
+			ArrayList<JobVector> bwTypeVectorList=new ArrayList<>();
 
 			jobList.forEach(v->{
-				if(v.getClassType()==1)timeTypeList.add(v);
-				else bwTypeList.add(v);
+				if(v.getClassType()==1)timeTypeVectorList.add(v);
+				else bwTypeVectorList.add(v);
 			});
+			
+			
 			//bind the cloudlets to the vms. This way, the broker
 			// will submit the bound cloudlets only to the specific VM
 
 			// algorithm for time-type processing
 
-			Collections.sort(vmlist,new SortbyMips());
-			Collections.sort(timeTypeList,new SortbyLength());
+			ArrayList<Cloudlet> timeTypeCloudletList=new ArrayList<Cloudlet>();
 
-			for(int i=0,j=0;i<5;i++,j++){
-				if(i<4){
-					broker.bindCloudletToVm(timeTypeList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
-				}else{
-					j=0;
-					broker.bindCloudletToVm(timeTypeList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
-				}
+			timeTypeVectorList.forEach(t->{
+				timeTypeCloudletList.add(t.getCloudlet());
+			});
+
+			broker.submitCloudletList(timeTypeCloudletList);
+
+			Collections.sort(vmlist,new SortbyMips());
+			Collections.sort(timeTypeVectorList,new SortbyLength());
+
+			for(int i=0,j=0;i<timeTypeVectorList.size();i++,j++){
+				j%=vmlist.size();
+				broker.bindCloudletToVm(timeTypeVectorList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
 			}
 
 
@@ -265,20 +303,25 @@ public class GreedyAlgo{
 		// In this example, it will have only one core.
 		List<Pe> peList = new ArrayList<Pe>();
 
-		int mips = 1000;
+		int mips = 2000;
 
 		// 3. Create PEs and add these into a list.
 		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(1, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(2, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(3, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
 
 		//4. Create Host with its id and list of PEs and add them to the list of machines
 		int hostId=0;
-		int ram = 2048; //host memory (MB)
+		int ram = 1024*4; //host memory (MB)
 		long storage = 1000000; //host storage
 		int bw = 10000;
 
 
 		//in this example, the VMAllocatonPolicy in use is SpaceShared. It means that only one VM
 		//is allowed to run on each Pe. As each Host has only one Pe, only one VM can run on each Host.
+		
+		// our quad core first machine
 		hostList.add(
     			new Host(
     				hostId,
@@ -288,7 +331,62 @@ public class GreedyAlgo{
     				peList,
     				new VmSchedulerSpaceShared(peList)
     			)
-    		); // This is our first machine
+			); 
+			
+
+		hostId++;
+		ram = 1024*2;
+		peList = new ArrayList<Pe>();
+		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(1, new PeProvisionerSimple(mips)));
+
+		// our dual core second machine
+		hostList.add(
+    			new Host(
+    				hostId,
+    				new RamProvisionerSimple(ram),
+    				new BwProvisionerSimple(bw),
+    				storage,
+    				peList,
+    				new VmSchedulerSpaceShared(peList)
+    			)
+			);
+
+		hostId++;
+		ram = 1024*2;
+		peList = new ArrayList<Pe>();
+		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(1, new PeProvisionerSimple(mips)));
+
+		// our dual core third machine
+		hostList.add(
+				new Host(
+					hostId,
+					new RamProvisionerSimple(ram),
+					new BwProvisionerSimple(bw),
+					storage,
+					peList,
+					new VmSchedulerSpaceShared(peList)
+				)
+			);
+
+
+		hostId++;
+		ram = 1024*1;
+		peList = new ArrayList<Pe>();
+		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+
+		// our single core fourth machine
+		hostList.add(
+				new Host(
+					hostId,
+					new RamProvisionerSimple(ram),
+					new BwProvisionerSimple(bw),
+					storage,
+					peList,
+					new VmSchedulerSpaceShared(peList)
+				)
+			);
 
 		// 5. Create a DatacenterCharacteristics object that stores the
 		//    properties of a data center: architecture, OS, list of

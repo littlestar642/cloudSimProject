@@ -7,13 +7,14 @@ public class JobVector{
     public double classType;
     public double startTime;
     public double endTime;
+    public double expTime;
     public double expBw;
     public double jVal;
     public double priority;
     public Cloudlet cl;
 
 
-    public JobVector(final double classType, final double startTime, final double endTime, final double expBw,
+    public JobVector(final double classType, final double startTime, final double endTime,final double expTime, final double expBw,
             final double jVal, final double priority,final Cloudlet cl) {
         this.classType=classType;
         this.startTime=startTime;
@@ -22,6 +23,7 @@ public class JobVector{
         this.jVal=jVal;
         this.priority=priority;
         this.cl=cl;
+        this.expTime=expTime;
     }
 
     public double getClassType(){
