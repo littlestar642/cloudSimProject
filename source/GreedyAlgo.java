@@ -331,6 +331,7 @@ public class GreedyAlgo{
 			HashMap<Integer,Double> etrMap=new HashMap<>();
 			ArrayList<Double> etrList=new ArrayList<>();
 
+			
 			newList.forEach(c->{
 				int vmID=c.getVmId();
 				int cID=c.getCloudletId();
@@ -360,8 +361,9 @@ public class GreedyAlgo{
 
 			TreeMap<Double,Integer> jefTimeMap=new TreeMap<>();
 
+			double theeta=0.5;
 			cloudletList.forEach(cl->{
-				jefTimeMap.put(tpMap.get(cl.getCloudletId())/etpMap.get(cl.getCloudletId()),cl.getCloudletId());
+				jefTimeMap.put(theeta*Math.log(tpMap.get(cl.getCloudletId())/etpMap.get(cl.getCloudletId())),cl.getCloudletId());
 			});
 
 			
