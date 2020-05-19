@@ -261,11 +261,30 @@ public class GreedyAlgo{
 			broker.submitCloudletList(timeTypeCloudletList);
 
 			Collections.sort(vmlist,new SortbyMips());
-			Collections.sort(timeTypeVectorList,new SortbyLength());
+			Collections.sort(timeTypeVectorList,new SortbyExpectationTime());
 
 			for(int i=0,j=0;i<timeTypeVectorList.size();i++,j++){
 				j%=vmlist.size();
 				broker.bindCloudletToVm(timeTypeVectorList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
+			}
+
+
+			// algorithm for bw-type processing
+
+			ArrayList<Cloudlet> bwTypeCloudletList=new ArrayList<Cloudlet>();
+
+			bwTypeVectorList.forEach(t->{
+				bwTypeCloudletList.add(t.getCloudlet());
+			});
+
+			broker.submitCloudletList(bwTypeCloudletList);
+
+			Collections.sort(vmlist,new SortbyBw());
+			Collections.sort(bwTypeVectorList,new SortbyExpectationBw());
+
+			for(int i=0,j=0;i<bwTypeVectorList.size();i++,j++){
+				j%=vmlist.size();
+				broker.bindCloudletToVm(bwTypeVectorList.get(i).getCloudlet().getCloudletId(),vmlist.get(j).getId());
 			}
 
 
