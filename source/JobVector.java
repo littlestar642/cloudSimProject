@@ -10,12 +10,12 @@ public class JobVector{
     public double expTime;
     public double expBw;
     public double jVal;
-    public double priority;
+    public int priority;
     public Cloudlet cl;
 
 
     public JobVector(final double classType, final double startTime, final double endTime,final double expTime, final double expBw,
-            final double jVal, final double priority,final Cloudlet cl) {
+            final double jVal, final int priority,final Cloudlet cl) {
         this.classType=classType;
         this.startTime=startTime;
         this.endTime=endTime;
@@ -30,6 +30,14 @@ public class JobVector{
         return this.classType;
     }
 
+    public double getExpBw(){
+        return this.expBw;
+    }
+
+    public double getExpTime(){
+        return this.expTime;
+    }
+
     public Cloudlet getCloudlet(){
         return this.cl;
     }
@@ -37,8 +45,16 @@ public class JobVector{
     public void setJval(double val){
         this.jVal=val;
     }
-    public void setPriority(double val){
+
+    public double getJval(){
+        return this.jVal;
+    }
+    public void setPriority(int val){
         this.priority=val;
+    }
+
+    public int getPriority(){
+        return this.priority;
     }
     public void setEndTime(double val){
         this.endTime=val;
@@ -46,6 +62,14 @@ public class JobVector{
 
     public void setStartTime(double val){
         this.startTime=val;
+    }
+
+    public double getStartTime(){
+        return this.startTime;
+    }
+
+    public double getEndTime(){
+        return this.endTime;
     }
 
     
