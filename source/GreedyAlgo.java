@@ -68,12 +68,9 @@ public class GreedyAlgo {
 		try {
 			// First step: Initialize the CloudSim package. It should be called
 			// before creating any entities.
-			int num_user = 1; // number of cloud users
-			Calendar calendar = Calendar.getInstance();
-			boolean trace_flag = false; // mean trace events
 
-			// Initialize the GridSim library
-			CloudSim.init(num_user, calendar, trace_flag);
+			createCloudsimInstance();
+			
 
 			// Second step: Create Datacenters
 			// Datacenters are the resource providers in CloudSim. We need at list one of
@@ -434,6 +431,15 @@ public class GreedyAlgo {
 		}
 	}
 
+
+	private static void createCloudsimInstance() {
+		int num_user = 1; // number of cloud users
+			Calendar calendar = Calendar.getInstance();
+			boolean trace_flag = false; // mean trace events
+
+			// Initialize the GridSim library
+			CloudSim.init(num_user, calendar, trace_flag);
+	}
 
 	private static void printTimeTypeJobVectorList(ArrayList<JobVector> list) {
 		int size = list.size();
