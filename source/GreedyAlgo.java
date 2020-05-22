@@ -372,7 +372,8 @@ public class GreedyAlgo {
 
 			Collections.sort(timeTypeVectorList, new SortbyJval());
 			Priority p=new Priority(1);
-			timeTypeVectorList.forEach(v->{
+			
+			timeTypeVectorList.forEach(v->{	
 				v.setPriority(p.getPriority());
 				p.increment();
 			});
