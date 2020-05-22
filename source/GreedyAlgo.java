@@ -54,6 +54,16 @@ public class GreedyAlgo {
 	private static List<Vm> vmlist;
 
 	private static List<JobVector> jobList;
+	private static ArrayList<Cloudlet> timeTypeCloudletList = new ArrayList<Cloudlet>();
+	private static ArrayList<Cloudlet> bwTypeCloudletList = new ArrayList<Cloudlet>();
+	private static HashMap<Integer, Double> tpMap = new HashMap<>();
+	private static HashMap<Integer, Double> etpMap = new HashMap<>();
+	private static ArrayList<JobVector> timeTypeVectorList = new ArrayList<>();
+	private static ArrayList<JobVector> bwTypeVectorList = new ArrayList<>();
+	private static HashMap<Integer, Double> bpMap = new HashMap<>();
+	private static HashMap<Integer, Double> ebpMap = new HashMap<>();
+
+
 
 	/**
 	 * Creates main() to run this example
@@ -75,6 +85,7 @@ public class GreedyAlgo {
 			// Second step: Create Datacenters
 			// Datacenters are the resource providers in CloudSim. We need at list one of
 			// them to run a CloudSim simulation
+
 			@SuppressWarnings("unused")
 			Datacenter datacenter0 = createDatacenter("Datacenter_0");
 
@@ -229,13 +240,8 @@ public class GreedyAlgo {
 			jobList.add(j7);
 			jobList.add(j8);
 
-			// submit cloudlet list to the broker
 
 			// separate both the type of jobs
-
-			ArrayList<JobVector> timeTypeVectorList = new ArrayList<>();
-			ArrayList<JobVector> bwTypeVectorList = new ArrayList<>();
-
 			jobList.forEach(v -> {
 				if (v.getClassType() == 1)
 					timeTypeVectorList.add(v);
@@ -243,44 +249,12 @@ public class GreedyAlgo {
 					bwTypeVectorList.add(v);
 			});
 
-			// bind the cloudlets to the vms. This way, the broker
-			// will submit the bound cloudlets only to the specific VM
-
 			// algorithm for time-type processing
-
-			ArrayList<Cloudlet> timeTypeCloudletList = new ArrayList<Cloudlet>();
-
-			timeTypeVectorList.forEach(t -> {
-				timeTypeCloudletList.add(t.getCloudlet());
-			});
-
-			broker.submitCloudletList(timeTypeCloudletList);
-
-			Collections.sort(vmlist, new SortbyMips());
-			Collections.sort(timeTypeVectorList, new SortbyExpectationTime());
-
-			for (int i = 0, j = 0; i < timeTypeVectorList.size(); i++, j++) {
-				j %= vmlist.size();
-				broker.bindCloudletToVm(timeTypeVectorList.get(i).getCloudlet().getCloudletId(), vmlist.get(j).getId());
-			}
+			broker = timeTypeJobProcessing(broker,vmlist);
 
 			// algorithm for bw-type processing
-
-			ArrayList<Cloudlet> bwTypeCloudletList = new ArrayList<Cloudlet>();
-
-			bwTypeVectorList.forEach(t -> {
-				bwTypeCloudletList.add(t.getCloudlet());
-			});
-
-			broker.submitCloudletList(bwTypeCloudletList);
-
-			Collections.sort(vmlist, new SortbyBw());
-			Collections.sort(bwTypeVectorList, new SortbyExpectationBw());
-
-			for (int i = 0, j = 0; i < bwTypeVectorList.size(); i++, j++) {
-				j %= vmlist.size();
-				broker.bindCloudletToVm(bwTypeVectorList.get(i).getCloudlet().getCloudletId(), vmlist.get(j).getId());
-			}
+			broker= bwTypeJobProcessing(broker, vmlist);
+			
 
 			// Sixth step: Starts the simulation
 			CloudSim.startSimulation();
@@ -289,66 +263,106 @@ public class GreedyAlgo {
 			List<Cloudlet> newList = broker.getCloudletReceivedList();
 
 			// add start and end time to job vectors
-			newList.forEach(c -> {
-				double ID = c.getCloudletId();
-				jobList.forEach(j -> {
-					if (j.getCloudlet().getCloudletId() == ID) {
-						j.setStartTime(c.getExecStartTime());
-						j.setEndTime(c.getFinishTime());
-					}
-				});
-			});
+			newList= setStartAndEndTimeOnJobs(newList);
 
 			// create DS for TPi
-			HashMap<Integer, Double> tpMap = new HashMap<>();
-			ArrayList<Double> trList = new ArrayList<>();
-
-			timeTypeCloudletList.forEach(c -> {
-				trList.add(c.getActualCPUTime());
-			});
-
-			double trMax = Collections.max(trList);
-			double trMin = Collections.min(trList);
-
-			double denom = trMax - trMin + 1;
-
-			timeTypeCloudletList.forEach(c -> {
-				tpMap.put(c.getCloudletId(), c.getActualCPUTime() / denom);
-			});
-
+			dsForTpiProcessing();
+			
 			// create DS for ETPi
-			HashMap<Integer, Double> etpMap = new HashMap<>();
-			HashMap<Integer, Double> etrMap = new HashMap<>();
-			ArrayList<Double> etrList = new ArrayList<>();
+			dsForEtpiProcessing(newList);
+			
+			// create DS for JEF time of timeType
+			dsForJefTimeType();
 
-			newList.forEach(c -> {
-				int vmID = c.getVmId();
-				int cID = c.getCloudletId();
-				vmlist.forEach(vm -> {
-					if (vm.getId() == vmID) {
-						timeTypeCloudletList.forEach(cl -> {
-							if (cl.getCloudletId() == cID) {
-								double val = (double) cl.getCloudletLength() / (double) vm.getMips();
-								etrMap.put(cID, val);
-								etrList.add(val);
-							}
-						});
+			// print the vectorList obtained with priority
+			printTimeTypeJobVectorList(timeTypeVectorList);
+
+
+
+
+			// create DS for BPi
+			dsForBpiProcessing(vmlist);
+			
+			// create DS for EBPi
+			dsForEbpiProcessing(jobList);
+			
+			// create DS for JEF time of bwType
+			dsForJefBwType();
+
+			// print the vectorList obtained with priority
+			printBwTypeJobVectorList(bwTypeVectorList);
+
+			
+			// stop cloudsim simulation
+			CloudSim.stopSimulation();
+
+
+			Log.printLine("Greedy Algo Execution finished!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.printLine("The simulation has been terminated due to an unexpected error");
+		}
+	}
+
+
+	private static void printBwTypeJobVectorList(ArrayList<JobVector> list) {
+
+		int size = list.size();
+		JobVector job;
+
+		String indent = "    ";
+		Log.printLine();
+		Log.printLine("========== Bandwidth Type Job List ==========");
+		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
+
+		DecimalFormat dft = new DecimalFormat("###.##");
+		for (int i = 0; i < size; i++) {
+			job = list.get(i);
+			Log.print(indent + job.getCloudlet().getCloudletId() + indent + indent);
+
+			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
+				Log.print("SUCCESS");
+
+				Log.printLine( indent + indent + dft.format(job.getStartTime()) + indent + indent + indent + dft.format(job.getEndTime()) +
+						indent + indent + "NA"  + indent + indent + indent + indent + dft.format(job.getExpBw()) +
+						indent + indent + indent + dft.format(job.getJval()) + indent + indent +  indent + job.getPriority());
+			}
+		}
+	}
+
+	private static void dsForJefBwType() {
+	
+		TreeMap<Integer,Double> jefBwMap = new TreeMap<>();
+
+		double theeta = 0.5;
+			bwTypeCloudletList.forEach(cl -> {
+				jefBwMap.put(cl.getCloudletId(),
+						theeta * Math.log(bpMap.get(cl.getVmId()) / ebpMap.get(cl.getCloudletId())));
+			});
+
+			Set<Integer> jefBwKs = jefBwMap.keySet();
+
+			for (int key : jefBwKs) {
+				bwTypeVectorList.forEach(j -> {
+					int ID = j.getCloudlet().getCloudletId();
+					if (key == ID) {
+						j.setJval(jefBwMap.get(key));
 					}
 				});
+			}
+
+			Collections.sort(bwTypeVectorList, new SortbyJval());
+			Priority p=new Priority(1);
+			
+			bwTypeVectorList.forEach(v->{	
+				v.setPriority(p.getPriority());
+				p.increment();
 			});
+	}
 
-			double etrMax = Collections.max(etrList);
-			double etrMin = Collections.min(etrList);
+	private static void dsForJefTimeType() {
 
-			double eDenom = etrMax - etrMin + 1;
-
-			timeTypeCloudletList.forEach(c -> {
-				etpMap.put(c.getCloudletId(), etrMap.get(c.getCloudletId()) / eDenom);
-			});
-
-			// create DS for JEF time of timeType
-
-			TreeMap<Integer, Double> jefTimeMap = new TreeMap<>();
+				TreeMap<Integer, Double> jefTimeMap = new TreeMap<>();
 
 			double theeta = 0.5;
 			timeTypeCloudletList.forEach(cl -> {
@@ -375,30 +389,12 @@ public class GreedyAlgo {
 				p.increment();
 			});
 
-			printTimeTypeJobVectorList(timeTypeVectorList);
+	}
 
-			// create DS for BPi
-			HashMap<Integer, Double> bpMap = new HashMap<>();
-			ArrayList<Long> brList = new ArrayList<>();
+	private static void dsForEbpiProcessing(List<JobVector> jobList2) {
+		ArrayList<Double> ebrList = new ArrayList<>();
 
-			vmlist.forEach(vm -> {
-				brList.add(vm.getBw());
-			});
-
-			double brMax = Collections.max(brList);
-			double brMin = Collections.min(brList);
-
-			double bwDenom = brMax - brMin + 1;
-
-			vmlist.forEach(vm -> {
-				bpMap.put(vm.getId(), vm.getBw() / bwDenom);
-			});
-
-			// create DS for EBPi
-			HashMap<Integer, Double> ebpMap = new HashMap<>();
-			ArrayList<Double> ebrList = new ArrayList<>();
-
-			jobList.forEach(j -> {
+			jobList2.forEach(j -> {
 				ebrList.add(j.getExpBw());
 			});
 
@@ -407,30 +403,126 @@ public class GreedyAlgo {
 
 			double ebDenom = ebrMax - ebrMin + 1;
 
-			jobList.forEach(j -> {
+			jobList2.forEach(j -> {
 				ebpMap.put(j.getCloudlet().getCloudletId(), j.getExpBw() / ebDenom);
 			});
-
-			// create DS for JEF time of bwType
-
-			TreeMap<Double, Integer> jefBwMap = new TreeMap<>();
-
-			newList.forEach(cl -> {
-				double val = Math.log(bpMap.get(cl.getVmId()) / ebpMap.get(cl.getCloudletId()));
-				jefBwMap.put(val, cl.getCloudletId());
-			});
-
-			CloudSim.stopSimulation();
-
-			// printCloudletList(newList);
-
-			Log.printLine("Greedy Algo Execution finished!");
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.printLine("The simulation has been terminated due to an unexpected error");
-		}
 	}
 
+	private static void dsForBpiProcessing(List<Vm> vmlist2) {
+		ArrayList<Long> brList = new ArrayList<>();
+
+			vmlist2.forEach(vm -> {
+				brList.add(vm.getBw());
+			});
+
+			double brMax = Collections.max(brList);
+			double brMin = Collections.min(brList);
+
+			double bwDenom = brMax - brMin + 1;
+
+			vmlist2.forEach(vm -> {
+				bpMap.put(vm.getId(), vm.getBw() / bwDenom);
+			});
+	}
+
+	private static List<Cloudlet> setStartAndEndTimeOnJobs(List<Cloudlet> newList) {
+		newList.forEach(c -> {
+			double ID = c.getCloudletId();
+			jobList.forEach(j -> {
+				if (j.getCloudlet().getCloudletId() == ID) {
+					j.setStartTime(c.getExecStartTime());
+					j.setEndTime(c.getFinishTime());
+				}
+			});
+		});
+		return newList;
+	}
+
+	
+
+	private static void dsForEtpiProcessing(List<Cloudlet> newList) {
+		HashMap<Integer, Double> etrMap = new HashMap<>();
+			ArrayList<Double> etrList = new ArrayList<>();
+
+			newList.forEach(c -> {
+				int vmID = c.getVmId();
+				int cID = c.getCloudletId();
+				vmlist.forEach(vm -> {
+					if (vm.getId() == vmID) {
+						timeTypeCloudletList.forEach(cl -> {
+							if (cl.getCloudletId() == cID) {
+								double val = (double) cl.getCloudletLength() / (double) vm.getMips();
+								etrMap.put(cID, val);
+								etrList.add(val);
+							}
+						});
+					}
+				});
+			});
+
+			double etrMax = Collections.max(etrList);
+			double etrMin = Collections.min(etrList);
+
+			double eDenom = etrMax - etrMin + 1;
+
+			timeTypeCloudletList.forEach(c -> {
+				etpMap.put(c.getCloudletId(), etrMap.get(c.getCloudletId()) / eDenom);
+			});
+	}
+
+	private static void dsForTpiProcessing() {
+		ArrayList<Double> trList = new ArrayList<>();
+
+			timeTypeCloudletList.forEach(c -> {
+				trList.add(c.getActualCPUTime());
+			});
+
+			double trMax = Collections.max(trList);
+			double trMin = Collections.min(trList);
+
+			double denom = trMax - trMin + 1;
+
+			timeTypeCloudletList.forEach(c -> {
+				tpMap.put(c.getCloudletId(), c.getActualCPUTime() / denom);
+			});
+	}
+
+	private static DatacenterBroker bwTypeJobProcessing(DatacenterBroker broker,List<Vm> vmlist2) {
+				bwTypeVectorList.forEach(t -> {
+					bwTypeCloudletList.add(t.getCloudlet());
+				});
+	
+				broker.submitCloudletList(bwTypeCloudletList);
+	
+				Collections.sort(vmlist, new SortbyBw());
+				Collections.sort(bwTypeVectorList, new SortbyExpectationBw());
+	
+				for (int i = 0, j = 0; i < bwTypeVectorList.size(); i++, j++) {
+					j %= vmlist.size();
+					broker.bindCloudletToVm(bwTypeVectorList.get(i).getCloudlet().getCloudletId(), vmlist.get(j).getId());
+				}
+
+		return broker ;
+	}
+
+	private static DatacenterBroker timeTypeJobProcessing(DatacenterBroker broker,List<Vm> vmlist2) {
+
+			timeTypeVectorList.forEach(t -> {
+				timeTypeCloudletList.add(t.getCloudlet());
+			});
+
+			broker.submitCloudletList(timeTypeCloudletList);
+
+			Collections.sort(vmlist, new SortbyMips());
+			Collections.sort(timeTypeVectorList, new SortbyExpectationTime());
+
+			for (int i = 0, j = 0; i < timeTypeVectorList.size(); i++, j++) {
+				j %= vmlist.size();
+				broker.bindCloudletToVm(timeTypeVectorList.get(i).getCloudlet().getCloudletId(), vmlist.get(j).getId());
+			}
+			return broker;
+
+	}
 
 	private static void createCloudsimInstance() {
 		int num_user = 1; // number of cloud users
