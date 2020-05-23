@@ -8,7 +8,10 @@
  */
 
 package source;
+import javax.swing.*;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,7 +65,7 @@ public class GreedyAlgo {
 	private static ArrayList<JobVector> bwTypeVectorList = new ArrayList<>();
 	private static HashMap<Integer, Double> bpMap = new HashMap<>();
 	private static HashMap<Integer, Double> ebpMap = new HashMap<>();
-
+	public static JFrame frame;
 
 
 	/**
@@ -276,7 +279,7 @@ public class GreedyAlgo {
 
 			// print the vectorList obtained with priority
 			printTimeTypeJobVectorList(timeTypeVectorList);
-
+			
 
 
 
@@ -291,7 +294,8 @@ public class GreedyAlgo {
 
 			// print the vectorList obtained with priority
 			printBwTypeJobVectorList(bwTypeVectorList);
-
+			
+			
 			
 			// stop cloudsim simulation
 			CloudSim.stopSimulation();
@@ -314,10 +318,19 @@ public class GreedyAlgo {
 		Log.printLine();
 		Log.printLine("========== Bandwidth Type Job List ==========");
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
-
+		JTable table1;
+		JScrollPane sp;
+//		frame = new JFrame("App");
+//        frame.setTitle("Greedy");
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.pack();
+        String[][] data = new String[4][8];
+        String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
+        
 		DecimalFormat dft = new DecimalFormat("###.##");
 		for (int i = 0; i < size; i++) {
 			job = list.get(i);
+			int x1 = job.getCloudlet().getCloudletId();
 			Log.print(indent + job.getCloudlet().getCloudletId() + indent + indent);
 
 			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
@@ -327,7 +340,21 @@ public class GreedyAlgo {
 						indent + indent + "NA"  + indent + indent + indent + indent + dft.format(job.getExpBw()) +
 						indent + indent + indent + dft.format(job.getJval()) + indent + indent +  indent + job.getPriority());
 			}
+			data[i] = new String[8];
+		    data[i][0] = Integer.toString(x1);
+		    data[i][1] = "SUCCESS";
+		    data[i][2] = Double.toString(job.getStartTime());
+		    data[i][3] = Double.toString(job.getEndTime());
+		    data[i][4] = "NA";
+		    data[i][5] = Double.toString(job.getExpBw());
+		    data[i][6] = Double.toString(job.getJval());
+		    data[i][7] = Double.toString(job.getPriority());
 		}
+		table1 = new JTable(data, columnNames);
+        table1.setBounds(30, 40, 200, 300);
+        sp = new JScrollPane(table1);
+        frame.add(sp, BorderLayout.SOUTH);
+        frame.setVisible(true);
 	}
 
 	private static void dsForJefBwType() {
@@ -541,10 +568,20 @@ public class GreedyAlgo {
 		Log.printLine();
 		Log.printLine("========== Time Type Job List ==========");
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
-
+		JTable table1;
+		JScrollPane sp;
+		frame = new JFrame("App");
+        frame.setTitle("Greedy");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        String[][] data = new String[4][8];
+        String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
+        
 		DecimalFormat dft = new DecimalFormat("###.##");
 		for (int i = 0; i < size; i++) {
 			job = list.get(i);
+			int x1 = job.getCloudlet().getCloudletId();
+			
 			Log.print(indent + job.getCloudlet().getCloudletId() + indent + indent);
 
 			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
@@ -553,8 +590,23 @@ public class GreedyAlgo {
 				Log.printLine( indent + indent + dft.format(job.getStartTime()) + indent + indent + indent + dft.format(job.getEndTime()) +
 						indent + indent + dft.format(job.getExpTime()) + indent + indent + indent + indent + "NA" +
 						indent + indent + indent + dft.format(job.getJval()) + indent + indent +  indent + job.getPriority());
+				data[i] = new String[8];
+			    data[i][0] = Integer.toString(x1);
+			    data[i][1] = "SUCCESS";
+			    data[i][2] = Double.toString(job.getStartTime());
+			    data[i][3] = Double.toString(job.getEndTime());
+			    data[i][4] = Double.toString(job.getExpTime());
+			    data[i][5] = "NA";
+			    data[i][6] = Double.toString(job.getJval());
+			    data[i][7] = Double.toString(job.getPriority());
 			}
 		}
+		
+		table1 = new JTable(data, columnNames);
+        table1.setBounds(30, 40, 200, 300);
+        sp = new JScrollPane(table1);
+        frame.add(sp, BorderLayout.CENTER);
+        frame.setVisible(true);
 
 	}
 
