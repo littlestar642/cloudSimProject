@@ -12,6 +12,7 @@ import javax.swing.*;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,8 +67,7 @@ public class GreedyAlgo {
 	private static HashMap<Integer, Double> bpMap = new HashMap<>();
 	private static HashMap<Integer, Double> ebpMap = new HashMap<>();
 	public static JFrame frame;
-
-
+	
 	/**
 	 * Creates main() to run this example
 	 */
@@ -357,6 +357,8 @@ public class GreedyAlgo {
 //        frame.setTitle("Greedy");
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        frame.pack();
+		Container c = frame.getContentPane();
+		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
         String[][] data = new String[4][8];
         String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
         
@@ -376,18 +378,22 @@ public class GreedyAlgo {
 			data[i] = new String[8];
 		    data[i][0] = Integer.toString(x1);
 		    data[i][1] = "SUCCESS";
-		    data[i][2] = Double.toString(job.getStartTime());
-		    data[i][3] = Double.toString(job.getEndTime());
+		    data[i][2] = dft.format(job.getStartTime());
+		    data[i][3] = dft.format(job.getEndTime());
 		    data[i][4] = "NA";
-		    data[i][5] = Double.toString(job.getExpBw());
-		    data[i][6] = Double.toString(job.getJval());
-		    data[i][7] = Double.toString(job.getPriority());
+		    data[i][5] = dft.format(job.getExpBw());
+		    data[i][6] = dft.format(job.getJval());
+		    data[i][7] = Integer.toString((int)job.getPriority());
 		}
 		table1 = new JTable(data, columnNames);
-        table1.setBounds(30, 40, 200, 300);
-        sp = new JScrollPane(table1);
-        frame.add(sp, BorderLayout.SOUTH);
+//        table1.setBounds(30, 40, 200, 300);
+//        sp = new JScrollPane(table1);
+//        frame.add(sp, BorderLayout.SOUTH);
+		c.add(table1.getTableHeader());
+		c.add(table1);
+		frame.pack();
         frame.setVisible(true);
+        
 	}
 
 	private static void dsForJefBwType() {
@@ -605,10 +611,15 @@ public class GreedyAlgo {
 
 		JTable table1;
 		JScrollPane sp;
+		
 		frame = new JFrame("App");
+		
         frame.setTitle("Greedy");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        
+        Container c = frame.getContentPane();
+    	c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+
         String[][] data = new String[4][8];
         String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
 
@@ -617,7 +628,6 @@ public class GreedyAlgo {
 		for (int i = 0; i < size; i++) {
 			job = list.get(i);
 			int x1 = job.getCloudlet().getCloudletId();
-			
 			Log.print(indent + job.getCloudlet().getCloudletId() + indent + indent);
 
 			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
@@ -629,21 +639,25 @@ public class GreedyAlgo {
 				data[i] = new String[8];
 			    data[i][0] = Integer.toString(x1);
 			    data[i][1] = "SUCCESS";
-			    data[i][2] = Double.toString(job.getStartTime());
-			    data[i][3] = Double.toString(job.getEndTime());
-			    data[i][4] = Double.toString(job.getExpTime());
+			    data[i][2] = dft.format(job.getStartTime());
+			    data[i][3] = dft.format(job.getEndTime());
+			    data[i][4] = dft.format(job.getExpTime());
 			    data[i][5] = "NA";
-			    data[i][6] = Double.toString(job.getJval());
-			    data[i][7] = Double.toString(job.getPriority());
+			    data[i][6] = dft.format(job.getJval());
+			    data[i][7] = Integer.toString((int)job.getPriority());
 			}
 		}
 
 		
 		table1 = new JTable(data, columnNames);
-        table1.setBounds(30, 40, 200, 300);
-        sp = new JScrollPane(table1);
-        frame.add(sp, BorderLayout.CENTER);
-        frame.setVisible(true);
+//        table1.setBounds(30, 40, 200, 300);
+//        sp = new JScrollPane(table1);
+//        frame.add(sp, BorderLayout.CENTER);
+//        frame.setVisible(true);
+		c.add(table1.getTableHeader());
+		c.add(table1);
+		frame.pack();
+		frame.setVisible(true);
 
 		Log.printLine(sumOfJefValues);
 
