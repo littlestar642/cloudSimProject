@@ -253,7 +253,7 @@ public class GreedyAlgo {
 			});
 
 			// algorithm for time-type processing
-			broker = timeTypeJobProcessing(broker,vmlist);
+			broker = timeTypeJobProcessing(broker,vmlist,1);
 
 			// algorithm for bw-type processing
 			broker= bwTypeJobProcessing(broker, vmlist);
@@ -294,11 +294,44 @@ public class GreedyAlgo {
 
 			// print the vectorList obtained with priority
 			printBwTypeJobVectorList(bwTypeVectorList);
-			
-			
+
+
+
+			int iterations=10; // change according to requirement
+			for(int i=0;i<iterations;i++) {
+
+
+				Collections.reverse(timeTypeVectorList);
+
+				broker = timeTypeJobProcessing(broker, vmlist, 2);
+
+				newList = broker.getCloudletReceivedList();
+
+				// add start and end time to job vectors
+				newList = setStartAndEndTimeOnJobs(newList);
+
+				// create DS for TPi
+				dsForTpiProcessing();
+
+				// create DS for ETPi
+				dsForEtpiProcessing(newList);
+
+				// create DS for JEF time of timeType
+				dsForJefTimeType();
+
+				// print the vectorList obtained with priority
+				printTimeTypeJobVectorList(timeTypeVectorList);
+
+			}
+
 			
 			// stop cloudsim simulation
 			CloudSim.stopSimulation();
+
+
+
+
+
 
 
 			Log.printLine("Greedy Algo Execution finished!");
@@ -523,7 +556,7 @@ public class GreedyAlgo {
 	
 				Collections.sort(vmlist, new SortbyBw());
 				Collections.sort(bwTypeVectorList, new SortbyExpectationBw());
-	
+
 				for (int i = 0, j = 0; i < bwTypeVectorList.size(); i++, j++) {
 					j %= vmlist.size();
 					broker.bindCloudletToVm(bwTypeVectorList.get(i).getCloudlet().getCloudletId(), vmlist.get(j).getId());
@@ -532,7 +565,7 @@ public class GreedyAlgo {
 		return broker ;
 	}
 
-	private static DatacenterBroker timeTypeJobProcessing(DatacenterBroker broker,List<Vm> vmlist2) {
+	private static DatacenterBroker timeTypeJobProcessing(DatacenterBroker broker,List<Vm> vmlist2,int flag) {
 
 			timeTypeVectorList.forEach(t -> {
 				timeTypeCloudletList.add(t.getCloudlet());
@@ -541,8 +574,9 @@ public class GreedyAlgo {
 			broker.submitCloudletList(timeTypeCloudletList);
 
 			Collections.sort(vmlist, new SortbyMips());
-			Collections.sort(timeTypeVectorList, new SortbyExpectationTime());
-
+			if(flag==1) {  // for the first iteration, for all other iteration flag=2 and we dont need to sort on basis of expectation time.
+				Collections.sort(timeTypeVectorList, new SortbyExpectationTime());
+			}
 			for (int i = 0, j = 0; i < timeTypeVectorList.size(); i++, j++) {
 				j %= vmlist.size();
 				broker.bindCloudletToVm(timeTypeVectorList.get(i).getCloudlet().getCloudletId(), vmlist.get(j).getId());
@@ -568,6 +602,7 @@ public class GreedyAlgo {
 		Log.printLine();
 		Log.printLine("========== Time Type Job List ==========");
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
+
 		JTable table1;
 		JScrollPane sp;
 		frame = new JFrame("App");
@@ -576,7 +611,8 @@ public class GreedyAlgo {
         frame.pack();
         String[][] data = new String[4][8];
         String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
-        
+
+		int sumOfJefValues=0;
 		DecimalFormat dft = new DecimalFormat("###.##");
 		for (int i = 0; i < size; i++) {
 			job = list.get(i);
@@ -586,7 +622,7 @@ public class GreedyAlgo {
 
 			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
 				Log.print("SUCCESS");
-
+				sumOfJefValues+=Math.abs(job.getJval()*10000000);
 				Log.printLine( indent + indent + dft.format(job.getStartTime()) + indent + indent + indent + dft.format(job.getEndTime()) +
 						indent + indent + dft.format(job.getExpTime()) + indent + indent + indent + indent + "NA" +
 						indent + indent + indent + dft.format(job.getJval()) + indent + indent +  indent + job.getPriority());
@@ -601,12 +637,16 @@ public class GreedyAlgo {
 			    data[i][7] = Double.toString(job.getPriority());
 			}
 		}
+
 		
 		table1 = new JTable(data, columnNames);
         table1.setBounds(30, 40, 200, 300);
         sp = new JScrollPane(table1);
         frame.add(sp, BorderLayout.CENTER);
         frame.setVisible(true);
+
+		Log.printLine(sumOfJefValues);
+
 
 	}
 
