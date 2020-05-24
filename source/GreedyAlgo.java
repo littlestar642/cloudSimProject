@@ -13,6 +13,8 @@ import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,6 +69,8 @@ public class GreedyAlgo {
 	private static HashMap<Integer, Double> bpMap = new HashMap<>();
 	private static HashMap<Integer, Double> ebpMap = new HashMap<>();
 	public static JFrame frame;
+	private static JLabel heading;
+	static Font  f = new Font(Font.SERIF,  Font.BOLD, 30);
 	
 	
 	/**
@@ -279,6 +283,11 @@ public class GreedyAlgo {
 			dsForJefTimeType();
 			frame = new JFrame("App");
 		    frame.setTitle("Greedy");
+		    heading= new JLabel("Greedy - Based Job Scheduling Algorithm Output in cloud computing for multiple iterations");
+			heading.setBounds(1500, 40, 1000, 35);
+			heading.setFont(f);
+			heading.setHorizontalAlignment(JLabel.CENTER);
+			frame.add(heading);
 		    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		   
 			// print the vectorList obtained with priority
@@ -343,6 +352,24 @@ public class GreedyAlgo {
 			e.printStackTrace();
 			Log.printLine("The simulation has been terminated due to an unexpected error");
 		}
+	}
+
+
+	private static void setLayout(Object object) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	private static void setPreferredSize(Dimension dimension) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	private static void add(JLabel heading2) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
