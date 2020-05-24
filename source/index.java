@@ -26,7 +26,7 @@ public class index extends JPanel {
 
 		button1=new JButton("Allocate");
 		add(button1);
-		button1.setBounds(480,500,400,80);
+		button1.setBounds(480,550,400,80);
 		button1.setFont(f);
 
 		 BufferedImage myPicture = null;
