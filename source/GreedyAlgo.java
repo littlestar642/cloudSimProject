@@ -68,6 +68,7 @@ public class GreedyAlgo {
 	private static HashMap<Integer, Double> ebpMap = new HashMap<>();
 	public static JFrame frame;
 	
+	
 	/**
 	 * Creates main() to run this example
 	 */
@@ -276,7 +277,10 @@ public class GreedyAlgo {
 			
 			// create DS for JEF time of timeType
 			dsForJefTimeType();
-
+			frame = new JFrame("App");
+		    frame.setTitle("Greedy");
+		    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		   
 			// print the vectorList obtained with priority
 			printTimeTypeJobVectorList(timeTypeVectorList);
 			
@@ -297,7 +301,7 @@ public class GreedyAlgo {
 
 
 
-			int iterations=10; // change according to requirement
+			int iterations = 6 ; // change according to requirement
 			for(int i=0;i<iterations;i++) {
 
 
@@ -352,11 +356,6 @@ public class GreedyAlgo {
 		Log.printLine("========== Bandwidth Type Job List ==========");
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
 		JTable table1;
-		JScrollPane sp;
-//		frame = new JFrame("App");
-//        frame.setTitle("Greedy");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.pack();
 		Container c = frame.getContentPane();
 		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
         String[][] data = new String[4][8];
@@ -386,9 +385,6 @@ public class GreedyAlgo {
 		    data[i][7] = Integer.toString((int)job.getPriority());
 		}
 		table1 = new JTable(data, columnNames);
-//        table1.setBounds(30, 40, 200, 300);
-//        sp = new JScrollPane(table1);
-//        frame.add(sp, BorderLayout.SOUTH);
 		c.add(table1.getTableHeader());
 		c.add(table1);
 		frame.pack();
@@ -611,18 +607,10 @@ public class GreedyAlgo {
 
 		JTable table1;
 		JScrollPane sp;
-		
-		frame = new JFrame("App");
-		
-        frame.setTitle("Greedy");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
         Container c = frame.getContentPane();
     	c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
-
         String[][] data = new String[4][8];
         String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
-
 		int sumOfJefValues=0;
 		DecimalFormat dft = new DecimalFormat("###.##");
 		for (int i = 0; i < size; i++) {
@@ -647,21 +635,12 @@ public class GreedyAlgo {
 			    data[i][7] = Integer.toString((int)job.getPriority());
 			}
 		}
-
-		
 		table1 = new JTable(data, columnNames);
-//        table1.setBounds(30, 40, 200, 300);
-//        sp = new JScrollPane(table1);
-//        frame.add(sp, BorderLayout.CENTER);
-//        frame.setVisible(true);
 		c.add(table1.getTableHeader());
 		c.add(table1);
 		frame.pack();
 		frame.setVisible(true);
-
 		Log.printLine(sumOfJefValues);
-
-
 	}
 
     
