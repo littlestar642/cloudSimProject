@@ -8,7 +8,11 @@
  */
 
 package source;
+import javax.swing.*;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,9 +66,9 @@ public class GreedyAlgo {
 	private static ArrayList<JobVector> bwTypeVectorList = new ArrayList<>();
 	private static HashMap<Integer, Double> bpMap = new HashMap<>();
 	private static HashMap<Integer, Double> ebpMap = new HashMap<>();
-
-
-
+	public static JFrame frame;
+	
+	
 	/**
 	 * Creates main() to run this example
 	 */
@@ -273,10 +277,13 @@ public class GreedyAlgo {
 			
 			// create DS for JEF time of timeType
 			dsForJefTimeType();
-
+			frame = new JFrame("App");
+		    frame.setTitle("Greedy");
+		    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		   
 			// print the vectorList obtained with priority
 			printTimeTypeJobVectorList(timeTypeVectorList);
-
+			
 
 
 
@@ -293,7 +300,8 @@ public class GreedyAlgo {
 			printBwTypeJobVectorList(bwTypeVectorList);
 
 
-			int iterations=10; // change according to requirement
+
+			int iterations = 6 ; // change according to requirement
 			for(int i=0;i<iterations;i++) {
 
 
@@ -319,6 +327,7 @@ public class GreedyAlgo {
 				printTimeTypeJobVectorList(timeTypeVectorList);
 
 			}
+
 			
 			// stop cloudsim simulation
 			CloudSim.stopSimulation();
@@ -346,10 +355,16 @@ public class GreedyAlgo {
 		Log.printLine();
 		Log.printLine("========== Bandwidth Type Job List ==========");
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
-
+		JTable table1;
+		Container c = frame.getContentPane();
+		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+        String[][] data = new String[4][8];
+        String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
+        
 		DecimalFormat dft = new DecimalFormat("###.##");
 		for (int i = 0; i < size; i++) {
 			job = list.get(i);
+			int x1 = job.getCloudlet().getCloudletId();
 			Log.print(indent + job.getCloudlet().getCloudletId() + indent + indent);
 
 			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
@@ -359,7 +374,22 @@ public class GreedyAlgo {
 						indent + indent + "NA"  + indent + indent + indent + indent + dft.format(job.getExpBw()) +
 						indent + indent + indent + dft.format(job.getJval()) + indent + indent +  indent + job.getPriority());
 			}
+			data[i] = new String[8];
+		    data[i][0] = Integer.toString(x1);
+		    data[i][1] = "SUCCESS";
+		    data[i][2] = dft.format(job.getStartTime());
+		    data[i][3] = dft.format(job.getEndTime());
+		    data[i][4] = "NA";
+		    data[i][5] = dft.format(job.getExpBw());
+		    data[i][6] = dft.format(job.getJval());
+		    data[i][7] = Integer.toString((int)job.getPriority());
 		}
+		table1 = new JTable(data, columnNames);
+		c.add(table1.getTableHeader());
+		c.add(table1);
+		frame.pack();
+        frame.setVisible(true);
+        
 	}
 
 	private static void dsForJefBwType() {
@@ -574,10 +604,18 @@ public class GreedyAlgo {
 		Log.printLine();
 		Log.printLine("========== Time Type Job List ==========");
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Start Time" + indent + "Finish Time" + indent + "Expected Time" + indent + "Expected Bw"+ indent + "JEF Value" + indent + "priority");
+
+		JTable table1;
+		JScrollPane sp;
+        Container c = frame.getContentPane();
+    	c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+        String[][] data = new String[4][8];
+        String[] columnNames = { "CloudletID", "Status" ,"Start Time", "Finish Time", "Expected time", "Expected Bw","JEF value", "priority" };
 		int sumOfJefValues=0;
 		DecimalFormat dft = new DecimalFormat("###.##");
 		for (int i = 0; i < size; i++) {
 			job = list.get(i);
+			int x1 = job.getCloudlet().getCloudletId();
 			Log.print(indent + job.getCloudlet().getCloudletId() + indent + indent);
 
 			if (job.getCloudlet().getCloudletStatus() == Cloudlet.SUCCESS){
@@ -586,10 +624,23 @@ public class GreedyAlgo {
 				Log.printLine( indent + indent + dft.format(job.getStartTime()) + indent + indent + indent + dft.format(job.getEndTime()) +
 						indent + indent + dft.format(job.getExpTime()) + indent + indent + indent + indent + "NA" +
 						indent + indent + indent + dft.format(job.getJval()) + indent + indent +  indent + job.getPriority());
+				data[i] = new String[8];
+			    data[i][0] = Integer.toString(x1);
+			    data[i][1] = "SUCCESS";
+			    data[i][2] = dft.format(job.getStartTime());
+			    data[i][3] = dft.format(job.getEndTime());
+			    data[i][4] = dft.format(job.getExpTime());
+			    data[i][5] = "NA";
+			    data[i][6] = dft.format(job.getJval());
+			    data[i][7] = Integer.toString((int)job.getPriority());
 			}
 		}
+		table1 = new JTable(data, columnNames);
+		c.add(table1.getTableHeader());
+		c.add(table1);
+		frame.pack();
+		frame.setVisible(true);
 		Log.printLine(sumOfJefValues);
-
 	}
 
     
