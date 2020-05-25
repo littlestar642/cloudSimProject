@@ -309,7 +309,11 @@ public class GreedyAlgo {
 			printBwTypeJobVectorList(bwTypeVectorList);
 
 
-
+			heading= new JLabel("Iterations for time type jobs");
+			heading.setBounds(1500, 40, 1000, 35);
+			heading.setFont(f);
+			heading.setHorizontalAlignment(JLabel.CENTER);
+			frame.add(heading);
 			int iterations = 6 ; // change according to requirement
 			for(int i=0;i<iterations;i++) {
 
